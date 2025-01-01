@@ -2,6 +2,10 @@ from pydantic import BaseModel
 from typing import Optional, Dict, Any, ClassVar
 from uuid import UUID, uuid4
 
+#Schema for userinput coming from frontend
+class UserInput(BaseModel):
+    prompt: str
+
 # Schema for request
 class QueryRequest(BaseModel):
     query: str
@@ -44,5 +48,3 @@ class User(BaseModel):
     email: str
     is_active: bool
 
-
-  

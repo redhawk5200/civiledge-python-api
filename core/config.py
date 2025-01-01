@@ -1,47 +1,33 @@
-from pydantic_settings import BaseSettings
-import os
-
-# Ensure the .env file is loaded from the same directory as this script
-current_dir = os.path.dirname(__file__)
-env_file_path = os.path.join(current_dir, ".env")
-
+from pydantic.v1 import BaseSettings
 
 class Settings(BaseSettings):
-    OPENAI_API_KEY: str  # This will be loaded from the .env file
-    ENV: str = "development"
-
+    OPENAI_KEY: str
+    DEBUG: bool
+    ENV: str
     class Config:
-        env_file = env_file_path
-        extra = "ignore"  # Allow extra keys in the environment file
+        env_file = ".env"
 
-
-# Define configuration classes for different environments
 class DevelopmentConfig(Settings):
-    pass
-
+    DEBUG: bool = True
+    TESTING: bool = True
 
 class ProductionConfig(Settings):
-    pass
+    DEBUG: bool = False
+    TESTING: bool = False
 
-
-# Map environment values to configuration classes
 config_dict = {
     "development": DevelopmentConfig,
     "production": ProductionConfig,
 }
 
-
 def get_config() -> Settings:
-    try:
-        initial_settings = Settings()
-        # Fetch the appropriate config class
-        config_class = config_dict.get(initial_settings.ENV, DevelopmentConfig)
-        return config_class()
-    except Exception as e:
-        print("Error loading settings:", e)
-        raise
-
+    # Load initial settings to read the ENV variable
+    initial_settings = Settings()
+    config_class = config_dict.get(initial_settings.ENV)
+    # Return the appropriate configuration class
+    return config_class()
 
 # Load the appropriate configuration
 config = get_config()
+
 
