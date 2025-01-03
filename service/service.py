@@ -4,7 +4,7 @@ from langchain_core.messages import HumanMessage
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import START, MessagesState, StateGraph
 from db.database import SessionLocal
-from db.crud import create_chat_session
+from db.crud import append_chat_session
 from agent.prompts import prompt_template
 from agent.tools import get_answer_status
 
@@ -58,7 +58,7 @@ def get_openai_response(input_conversation, userid: str):
         # Save to database
         db = SessionLocal()
         try:
-            create_chat_session(
+            append_chat_session(
                 db=db,
                 userid=userid,
                 langchain_thread_id=thread_id,
