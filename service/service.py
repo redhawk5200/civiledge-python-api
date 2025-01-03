@@ -1,4 +1,3 @@
-
 from core.config import config
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
@@ -6,6 +5,10 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import START, MessagesState, StateGraph
 from langchain_core.tools import tool
+from db.database import SessionLocal
+from db.crud import create_chat_session
+import json
+from datetime import datetime
 
 #model to run LLM
 model = ChatOpenAI(api_key=config.OPENAI_KEY,
@@ -62,12 +65,36 @@ thread = {"configurable": {"thread_id": "abc123"}}
 
 #get openai response with retries
 
-def get_openai_response(input_conversation):
+def get_openai_response(input_conversation, userid: str):
     try:     
         query = [HumanMessage(input_conversation)]
-        response_text= app.invoke({"messages": query}, thread)
+        thread_id = f"thread_{userid}_{int(datetime.utcnow().timestamp())}"
+        thread = {"configurable": {"thread_id": thread_id}}
+        
+        response_text = app.invoke({"messages": query}, thread)
+        
+        # Convert messages to a serializable format
+        messages_json = json.dumps({
+            "input": input_conversation,
+            "response": [msg.content for msg in response_text["messages"]]
+        })
+        
+        # Save to database
+        db = SessionLocal()
+        try:
+            create_chat_session(
+                db=db,
+                userid=userid,
+                langchain_thread_id=thread_id,
+                messages=messages_json
+            )
+        finally:
+            db.close()
+
+        for message in response_text["messages"]:
+            print(message.pretty_print())
+
         return response_text
+
     except Exception as e:
         return str(e)
-
-

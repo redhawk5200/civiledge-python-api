@@ -4,7 +4,8 @@ from uuid import UUID, uuid4
 
 #Schema for userinput coming from frontend
 class UserInput(BaseModel):
-    prompt: str
+    message: str
+    userid: str
 
 # Schema for request
 class QueryRequest(BaseModel):
@@ -47,4 +48,3 @@ class User(BaseModel):
     name: str
     email: str
     is_active: bool
-
