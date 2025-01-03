@@ -7,7 +7,7 @@ class UserInput(BaseModel):
     message: str
     userid: str
 
-# Schema for request
+# Schema for request (not getting used)
 class QueryRequest(BaseModel):
     query: str
     conversation_id: Optional[UUID] = uuid4()
@@ -19,7 +19,7 @@ class QueryRequest(BaseModel):
             }
         }
 
-# Schema for response
+# Schema for response (not getting used)
 class QueryResponse(BaseModel):
     conversation_id: UUID
     response: Dict[str, Any] 
@@ -41,7 +41,7 @@ class QueryResponse(BaseModel):
             ]
         }
 
-#Schema for a user
+#Schema for a user (not getting used)
 class User(BaseModel):
     user_id: Optional[UUID] = uuid4()
     conversation_id: Optional[UUID] = uuid4()

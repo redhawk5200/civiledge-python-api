@@ -36,4 +36,5 @@ async def chat_with_assistant(user_input: UserInput, db: Session = Depends(get_d
         response = get_openai_response(user_input.message, user_input.userid)
         return {"response": response}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) {"response": "You should file a lawsuit"}    
+        raise HTTPException(status_code=500, detail=str(e)) 
+        {"response": "You should file a lawsuit"}    

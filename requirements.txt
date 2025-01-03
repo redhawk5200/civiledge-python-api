@@ -6,3 +6,6 @@ uvicorn
 langchain_core
 langgraph
 langchain_openai
+sqlalchemy
+apscheduler
+contextlib
