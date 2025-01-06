@@ -33,23 +33,12 @@ def append_chat_session(db: Session, userid: str, langchain_thread_id: str, mess
         existing_messages = json.loads(existing_session.messages)
         # Parse the new messages
         new_messages = json.loads(messages)
-        print("\n==========================================\n")
-        print ("existing messages", existing_messages)
-        print ("new messages", new_messages)
 
-        # Ensure existing_messages and new_messages are lists
-        if isinstance(existing_messages, list) and isinstance(new_messages, list):
-            # Merge the messages
-            updated_messages = json.dumps(existing_messages['response'].append(new_messages['response'][:-1]))
-        else:
-            raise ValueError("Messages must be lists for appending.")
+        # Merge the messages (adjust as necessary for your use case)
+        existing_messages.update(new_messages)
 
-        print("\n==========================================\n")
-        print ("\n\nexisting messages", existing_messages)
-        print ("new messages", new_messages)
-
-        # Update the session with merged messages
-        existing_session.messages = updated_messages
+        # Serialize the updated messages back to JSON
+        existing_session.messages = json.dumps(existing_messages)
         existing_session.timestamp = datetime.utcnow()
         db.commit()
         db.refresh(existing_session)
