@@ -5,8 +5,8 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import START, MessagesState, StateGraph
 from db.database import SessionLocal
 from db.crud import append_chat_session
-from agent.prompts import prompt_template
-from agent.tools import get_answer_status
+from agent.prompts import prompt_template, second_prompt_template
+from agent.tools import get_summary
 
 import json
 
@@ -15,7 +15,7 @@ model = ChatOpenAI(api_key=config.OPENAI_KEY,
                    model="gpt-4o-mini")
 
 #we are assigning the tools with a list which is having only one tool as of now
-tools=([get_answer_status])
+tools=([get_summary])
 
 #we are binding the tools to the llm model
 model_with_tools = model.bind_tools(tools)
@@ -24,9 +24,12 @@ model_with_tools = model.bind_tools(tools)
 workflow = StateGraph(state_schema=MessagesState)
 
 def call_model(state: MessagesState):
+    # First prompt invocation
     prompt = prompt_template.invoke(state)
     response = model_with_tools.invoke(prompt)
+
     return {"messages": response}
+
 
 # Define the (single) node in the graph
 workflow.add_edge(START, "model")
@@ -69,6 +72,7 @@ def get_openai_response(input_conversation, userid: str):
 
         for message in response_text["messages"]:
             print(message.pretty_print())
+            
 
         return response_text
 
