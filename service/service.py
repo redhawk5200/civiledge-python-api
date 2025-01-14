@@ -51,7 +51,7 @@ def get_openai_response(input_conversation, userid: str):
         thread = {"configurable": {"thread_id": thread_id}}
         
         response_text = app.invoke({"messages": query}, thread)
-        
+        print(response_text)
         # Convert messages to a serializable format
         messages_json = json.dumps({
             "input": input_conversation,
