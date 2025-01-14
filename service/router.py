@@ -34,7 +34,8 @@ async def health_check():
 async def chat_with_assistant(user_input: UserInput, db: Session = Depends(get_db)):
     try:
         response = get_openai_response(user_input.message, user_input.userid)
-        return {"response": response}
+        return {"response": response["messages"][-1].content}
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) 
         {"response": "You should file a lawsuit"}    

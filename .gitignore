@@ -50,3 +50,13 @@ Thumbs.db
 
 # the env file
 .env
+
+# Python cache directories
+*.pyc
+__pycache__/
+
+
+# SQLite database file
+sqlite_database.db
+
+

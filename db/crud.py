@@ -34,10 +34,9 @@ def append_chat_session(db: Session, userid: str, langchain_thread_id: str, mess
         # Parse the new messages
         new_messages = json.loads(messages)
 
-        # Merge the messages (adjust as necessary for your use case)
+        # Update the existing messages
         existing_messages.update(new_messages)
 
-        # Serialize the updated messages back to JSON
         existing_session.messages = json.dumps(existing_messages)
         existing_session.timestamp = datetime.utcnow()
         db.commit()
