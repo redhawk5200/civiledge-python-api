@@ -34,8 +34,34 @@ async def health_check():
 async def chat_with_assistant(user_input: UserInput, db: Session = Depends(get_db)):
     try:
         response = get_openai_response(user_input.message, user_input.userid)
-        return {"response": response["messages"][-1].content}
+
+        print(response)
+
+        # Extract the last message (AIMessage object)
+        last_message = response["messages"][-1]
+
+        # Check if a tool call exists in additional_kwargs
+        if hasattr(last_message, "additional_kwargs"):
+            tool_calls = last_message.additional_kwargs.get("tool_calls", [])
+            if tool_calls and isinstance(tool_calls, list):
+                first_tool_call = tool_calls[0]
+                arguments = first_tool_call.get("function", {}).get("arguments", "")
+                if arguments:
+                    try:
+                        # Parse the arguments as JSON
+                        parsed_arguments = json.loads(arguments)
+                        tool_report = parsed_arguments.get("report")
+                        if tool_report:
+                            return {"response": tool_report}
+                    except json.JSONDecodeError:
+                        print("Error decoding JSON arguments:", arguments)
+
+        # Default to returning the content of the last AIMessage
+        if hasattr(last_message, "content"):
+            return {"response": last_message.content or "No relevant response found."}
+
+        # Fallback response
+        return {"response": "No relevant response found."}
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) 
-        {"response": "You should file a lawsuit"}    
+        raise HTTPException(status_code=500, detail=str(e))

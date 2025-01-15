@@ -1,30 +1,45 @@
+from typing import Annotated
 from langchain_core.tools import tool
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage, AIMessage
+from agent.prompts import report_format
+from core.config import config
 
-
-#this is tool number 1 in langchain
 @tool
-def get_summary(report: str) -> dict:
+def get_report(
+    report: Annotated[str, 
+    "The conversation text between user and legal support assistant."]
+    ) -> dict:
     """
-    You are a legal summary assistant. You have been given a conversation between the user and the legal support assistant.
-            The conversation contains the the user's case story and a set of questions asked by the legal support assistant, to which the user has responded. 
-            Your task is to extract the case story, questions asked by the legal support assistant and the user's relevant responses in the following format:
-
-            Case Story:
-            
-            [Case Story]
-
-            Questions Asked:
-
-            Question 1: [Question 1]
-            Answer 1: [Answer 1]
-
-            Question 2: [Question 2]
-            Answer 2: [Answer 2]
-
-            and so on for all the questions asked by the legal support assistant and the user's responses.
-
-            Dont repeat the question and answer, first is the case story, then one question followed by one answer.
-
-            Once you have extracted the information, you will return the extracted information as the response to the user.
-"""
-    return {"report": report}
+    Legal summary assistant tool that processes conversation.
+    """
+    try:
+        # Create message content with proper formatting
+        content = f"Based on this conversation:\n{report}\n\nGenerate a report following this format:\n{report_format}"
+        print("=" * 50)
+        # Initialize model
+        model = ChatOpenAI(
+            api_key=config.OPENAI_KEY,
+            model="gpt-4",
+            temperature=0
+        )
+        
+        # Create proper message structure
+        messages = [AIMessage(content=content)]
+        
+        # Invoke the model
+        response = model.invoke(messages)
+        
+        # Extract content from response
+        report_content = response.content if hasattr(response, 'content') else str(response)
+        
+        print("=" * 50)
+        print("Generated Report:")
+        print(report_content)
+        print("=" * 50)
+        
+        return {"report": report_content}
+        
+    except Exception as e:
+        print(f"Error generating report: {str(e)}")
+        return {"error": str(e)}
