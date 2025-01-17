@@ -6,7 +6,8 @@ from langgraph.graph import START, MessagesState, StateGraph
 from db.database import SessionLocal
 from db.crud import append_chat_session
 from agent.prompts import prompt_template
-from agent.tools import get_report
+from agent.tools import extract_conversation
+
 
 
 import json
@@ -16,7 +17,7 @@ model = ChatOpenAI(api_key=config.OPENAI_KEY,
                    model="gpt-4o-mini")
 
 #we are assigning the tools with a list which is having only one tool as of now
-tools=([get_report])
+tools=[extract_conversation]
 
 #we are binding the tools to the llm model
 model_with_tools = model.bind_tools(tools)

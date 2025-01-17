@@ -50,7 +50,7 @@ async def chat_with_assistant(user_input: UserInput, db: Session = Depends(get_d
                     try:
                         # Parse the arguments as JSON
                         parsed_arguments = json.loads(arguments)
-                        tool_report = parsed_arguments.get("report")
+                        tool_report = parsed_arguments.get("convo")
                         if tool_report:
                             return {"response": tool_report}
                     except json.JSONDecodeError:
